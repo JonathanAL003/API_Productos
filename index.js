@@ -4,7 +4,7 @@ const cors = require('cors');
 const mysql = require('mysql2');
 
 const PORT = process.env.PORT || 8080;
-const host = process.env.host || 'localhost'
+const host = process.env.MYSQLHOST || 'localhost'
 const user = process.env.DB_USER || 'root'
 const password = process.env.MYSQLPASSWORD || ''
 const database = process.env.MYSQL_DATABASE || 'bdweb'
