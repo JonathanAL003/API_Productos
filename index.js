@@ -3,12 +3,12 @@ const app = express();
 const cors = require('cors');
 const mysql = require('mysql2');
 
-const PORT = process.env.MYSQLPORT || 8080;
+const PORT = process.env.PORT || 8080;
 const host = process.env.host || 'localhost'
-const user = process.env.user || 'root'
-const password = process.env.password || ''
-const database = process.env.database || 'bdweb'
-const dbport = process.env.dbport || 3306
+const user = process.env.DB_USER || 'root'
+const password = process.env.MYSQLPASSWORD || ''
+const database = process.env.MYSQL_DATABASE || 'bdweb'
+const dbport = process.env.MYSQLPORT || 3306
 
 app.use(cors());
 app.use(express.json());
