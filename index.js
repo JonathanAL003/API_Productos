@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mysql = require('mysql2');
+const swaggerJsdoc = require('swagger-jsdoc'); 
+const swaggerUi = require('swagger-ui-express');
 
 const PORT = process.env.PORT || 8080;
 const host = process.env.MYSQLHOST || 'localhost'
@@ -38,9 +40,45 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
+const options = {
+  definition: {
+    openapi: '3.0.0', 
+    info: {
+      title: 'API de Productos', 
+      version: '1.0.2',
+      description: 'API para gestionar productos',
+    },
+  },
+  apis: [__filename],
+};
+
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     description: Retorna un saludo de bienvenida
+ *     responses:
+ *       200:
+ *         description: 'Hello, world!'
+ */
+
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
+
+/**
+ * @swagger
+ * /producto:
+ *   get:
+ *     description: Retorna todos los productos
+ *     responses:
+ *       200:
+ *         description: Datos de todos los productos
+ */
 
 app.get("/producto", (req, res) => {
   connection.query('SELECT * FROM producto', (error, results) => {
@@ -51,6 +89,23 @@ app.get("/producto", (req, res) => {
       }
   });
 });
+
+/**
+ * @swagger
+ * /producto/{id}:
+ *   get:
+ *     description: Retorna un producto por su ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del producto
+ *     responses:
+ *       200:
+ *         description: Datos del producto
+ *       404:
+ *         description: Producto no encontrado
+ */
 
 app.get("/producto/:id", (req, res) => {
   const productId = req.params.id;
@@ -68,6 +123,43 @@ app.get("/producto/:id", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /producto/new:
+ *   post:
+ *     description: Crea un nuevo producto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Id_Producto:
+ *                 type: string
+ *               Nombre:
+ *                 type: string
+ *               Categoria:
+ *                 type: string
+ *               Descripcion:
+ *                 type: string
+ *               Precio:
+ *                 type: string
+ *               Valoracion:
+ *                 type: string
+ *               Ingredientes:
+ *                 type: string
+ *               Costo:
+ *                 type: string
+ *               Minutos:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Producto creado con éxito
+ *       500:
+ *         description: Error del servidor
+ */
+
 app.post("/producto/new", async (req, res) => {
   const {Id_Producto,Nombre,Categoria,Descripcion,Precio,Valoracion,Ingredientes,Costo,Minutos} = req.body;
   try {
@@ -78,6 +170,31 @@ app.post("/producto/new", async (req, res) => {
       }
     });
 
+/**
+ * @swagger
+ * /producto/{id}:
+ *   put:
+ *     description: Actualiza un producto por su ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del producto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               // ... (propiedades a actualizar)
+ *     responses:
+ *       200:
+ *         description: Producto actualizado con éxito
+ *       500:
+ *         description: Error del servidor
+ */
+    
 app.put("/producto/:id", async (req, res) => {
     const { id } = req.params;
     const updateFields = req.body;
@@ -101,7 +218,26 @@ app.put("/producto/:id", async (req, res) => {
       res.status(500).send(error.message);
     }
   });
-      
+     
+/**
+ * @swagger
+ * /producto/{id}:
+ *   delete:
+ *     description: Elimina un producto por su ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del producto
+ *     responses:
+ *       200:
+ *         description: Producto eliminado con éxito
+ *       404:
+ *         description: Producto no encontrado
+ *       500:
+ *         description: Error del servidor
+ */  
+
 app.delete("/producto/:id", (req, res) => {
     const productId = req.params.id;
     console.log(req.params.id);
